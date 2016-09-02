@@ -14,6 +14,7 @@ class MLEngine:
 		"""Init the engine with the dataset path
 		"""
 		print("Creating engine with dataset path=%s" %dataset_path)
+		self.dataset_path = dataset_path
 		self.weightsFile = os.path.join(dataset_path, 'weights.hdf5')
 
 		print("[INFO] downloading MNIST...")
@@ -27,7 +28,7 @@ class MLEngine:
 		data = data[:, np.newaxis, :, :]
 		(self.trainData, self.testData, self.trainLabels, self.testLabels) = train_test_split( data / 255.0, dataset.target.astype("int"), test_size=0.33)
 		print "{Dims[0]} x {Dims[1]} x {Dims[2]} x {Dims[3]}".format(Dims=self.testData.shape)
-		print self.testData
+		print self.testData[0]
 		self.trainLabels = np_utils.to_categorical(self.trainLabels, 10)
 		self.testLabels = np_utils.to_categorical(self.testLabels, 10)
 
@@ -59,9 +60,31 @@ class MLEngine:
 
 	def predict(self):
 		model = self.load_model()
+		"""
 		i = 17
-		probs = model.predict(self.testData[np.newaxis, i])
-		prediction = probs.argmax(axis=1)
+		imageData = self.testData[np.newaxis, i]
+		print "Image data shape is..."
+		print imageData.shape
+		"""
 
-		print("[INFO] Predicted: {}, Actual: {}".format(prediction[0],
+		file = os.path.join(self.dataset_path, 'mnist_test_10.csv')
+		f = open(file, 'r')
+		a = f.readlines()
+		f.close()
+		for line in a:
+			linebits = line.split(',')
+			myInt = 255
+			newList = [x / myInt for x in np.asfarray(linebits)]
+			imageData = np.asfarray(newList[1:]).reshape((28,28))
+			imageData = np.expand_dims(imageData, axis=0)
+			imageData = np.expand_dims(imageData, axis=0)
+
+			probs = model.predict(imageData)
+			prediction = probs.argmax(axis=1)
+
+			"""
+			print("[INFO] Predicted: {}, Actual: {}".format(prediction[0],
 				np.argmax(self.testLabels[i])))
+			"""
+			print("[INFO] Predicted: {}, Actual: {}".format(prediction[0],
+				linebits[0]))
