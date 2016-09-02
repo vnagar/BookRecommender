@@ -18,6 +18,7 @@ create_datastore_dirs(dataset_path)
 dataset_path = os.path.join(dataset_path, 'datasets')
 create_datastore_dirs(dataset_path)
 
+from app import app
 from ml.engine import MLEngine
 
 ap = argparse.ArgumentParser(add_help=False)
@@ -35,6 +36,7 @@ args = ap.parse_args()
 
 if args.cmd == 'start':
 	print "In start"
+	app.run(debug=True)
 elif args.cmd == 'create_db':
 	print "In create db"
 elif args.cmd == 'import_books':
