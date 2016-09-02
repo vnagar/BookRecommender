@@ -1,0 +1,32 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+	<div class="hero-unit">
+        <h1>Book recommendation service</h1>
+
+		<p>
+			This service uses machine learning to recommend books based on your preferences. The more books you rate the better the system gets.
+		</p>
+
+		<a href="{{ url_for('ratebooks') }}" class="btn btn-success btn-large">Rate Books</a>
+    </div>
+
+	<h3>Hello, {{ user.username }}! Here are some recommendations for you!</h3>
+	<div class="row">
+		{% for book in books %}
+			<div class="span2">
+				<a href="#" class="thumbnail">
+					<img src = "/static/logo.png" alt = "logo thumbnail">
+				</a>
+				<div class="caption">
+					<h6>{{book.name}}</h6>
+					<p>Some sample text.</p>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+
+{% endblock %}
+
