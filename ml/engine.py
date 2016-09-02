@@ -59,14 +59,6 @@ class MLEngine:
 		return model
 
 	def predict(self):
-		model = self.load_model()
-		"""
-		i = 17
-		imageData = self.testData[np.newaxis, i]
-		print "Image data shape is..."
-		print imageData.shape
-		"""
-
 		file = os.path.join(self.dataset_path, 'mnist_test_10.csv')
 		f = open(file, 'r')
 		a = f.readlines()
@@ -75,16 +67,19 @@ class MLEngine:
 			linebits = line.split(',')
 			myInt = 255
 			newList = [x / myInt for x in np.asfarray(linebits)]
-			imageData = np.asfarray(newList[1:]).reshape((28,28))
-			imageData = np.expand_dims(imageData, axis=0)
-			imageData = np.expand_dims(imageData, axis=0)
+			imageData = newList[1:]
+			print "Actual label:{}".format(linebits[0])
+			self.predictImage(imageData)
 
-			probs = model.predict(imageData)
-			prediction = probs.argmax(axis=1)
+	def predictImage(self, data):
+		model = self.load_model()
 
-			"""
-			print("[INFO] Predicted: {}, Actual: {}".format(prediction[0],
-				np.argmax(self.testLabels[i])))
-			"""
-			print("[INFO] Predicted: {}, Actual: {}".format(prediction[0],
-				linebits[0]))
+		imageData = np.asfarray(data).reshape((28,28))
+		imageData = np.expand_dims(imageData, axis=0)
+		imageData = np.expand_dims(imageData, axis=0)
+
+		probs = model.predict(imageData)
+		prediction = probs.argmax(axis=1)
+
+		print "Prediction: {}".format(prediction[0])
+		return prediction[0]
