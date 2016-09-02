@@ -12,6 +12,7 @@ datastore/db_repository/*
 *.pyc
 *.db
 *.pkl
+*.hdf5
 
 
 # Exclude OS X folder attributes

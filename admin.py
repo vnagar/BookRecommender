@@ -18,6 +18,8 @@ create_datastore_dirs(dataset_path)
 dataset_path = os.path.join(dataset_path, 'datasets')
 create_datastore_dirs(dataset_path)
 
+from ml.engine import MLEngine
+
 ap = argparse.ArgumentParser(add_help=False)
 subparsers = ap.add_subparsers(dest='cmd')
 parser_start = subparsers.add_parser("start", help="start the server")
@@ -27,6 +29,7 @@ parser_migrate = subparsers.add_parser("migrate_db", help="migrate db")
 parser_upgrade = subparsers.add_parser("upgrade_db", help="upgrade db")
 parser_downgrade = subparsers.add_parser("downgrade_db", help="downgrade db")
 parser_train = subparsers.add_parser("train_model", help="train the model")
+parser_train = subparsers.add_parser("predict", help="test prediction")
 
 args = ap.parse_args()
 
@@ -44,6 +47,12 @@ elif args.cmd == 'downgrade_db':
 	print "In downgrade db"
 elif args.cmd == 'train_model':
 	print "In train model"
+	engine = MLEngine(dataset_path)
+	engine.train_model(saveWeights=True)
+elif args.cmd == 'predict':
+	print "In predict model"
+	engine = MLEngine(dataset_path)
+	engine.predict()
 else:
 	print "Unknown command"
 
