@@ -19,6 +19,7 @@ dataset_path = os.path.join(dataset_path, 'datasets')
 create_datastore_dirs(dataset_path)
 
 from app import app
+from models.dbutils import DBUtils
 from ml.engine import MLEngine
 
 ap = argparse.ArgumentParser(add_help=False)
@@ -32,27 +33,31 @@ parser_downgrade = subparsers.add_parser("downgrade_db", help="downgrade db")
 parser_train = subparsers.add_parser("train_model", help="train the model")
 parser_train = subparsers.add_parser("predict", help="test prediction")
 
+dbutil = DBUtils()
 args = ap.parse_args()
 
 if args.cmd == 'start':
-	print "In start"
 	app.run(debug=True)
 elif args.cmd == 'create_db':
-	print "In create db"
+	print "Creating db..."
+	dbutil.db_create()
 elif args.cmd == 'import_books':
 	print "In import books"
 elif args.cmd == 'migrate_db':
-	print "In migrate db"
+	print "Migrating db..."
+	dbutil.db_migrate()
 elif args.cmd == 'upgrade_db':
-	print "In upgrade db"
+	print "Upgrading db..."
+	dbutil.db_upgrade()
 elif args.cmd == 'downgrade_db':
-	print "In downgrade db"
+	print "Downgrading db..."
+	dbutil.db_downgrade()
 elif args.cmd == 'train_model':
-	print "In train model"
+	print "Training model..."
 	engine = MLEngine(dataset_path)
 	engine.train_model(saveWeights=True)
 elif args.cmd == 'predict':
-	print "In predict model"
+	print "Predicting model..."
 	engine = MLEngine(dataset_path)
 	engine.predict()
 else:

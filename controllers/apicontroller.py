@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from app import app
+from app import app, engine
 from flask import jsonify, request
 from ml.engine import MLEngine
 from config import datasetdir
@@ -15,6 +15,5 @@ def api_predict():
 	print "Data:{}".format(request.data)
 	linebits = request.data.split(',')
 	newList = np.asfarray(linebits)
-	engine = MLEngine(datasetdir)
 	prediction = engine.predictImage(newList)
 	return jsonify(prediction)

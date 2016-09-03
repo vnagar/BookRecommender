@@ -27,8 +27,10 @@ class MLEngine:
 		# add 1 channel per image for keras
 		data = data[:, np.newaxis, :, :]
 		(self.trainData, self.testData, self.trainLabels, self.testLabels) = train_test_split( data / 255.0, dataset.target.astype("int"), test_size=0.33)
-		print "{Dims[0]} x {Dims[1]} x {Dims[2]} x {Dims[3]}".format(Dims=self.testData.shape)
-		print self.testData[0]
+
+		#print "{Dims[0]} x {Dims[1]} x {Dims[2]} x {Dims[3]}".format(Dims=self.testData.shape)
+		#print self.testData[0]
+
 		self.trainLabels = np_utils.to_categorical(self.trainLabels, 10)
 		self.testLabels = np_utils.to_categorical(self.testLabels, 10)
 
