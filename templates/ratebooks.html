@@ -1,0 +1,26 @@
+
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+
+	<h3>Rate Movies</h3>
+    <div class="row">
+		<!-- books is a Paginate object -->
+        {% for book in books.items %}
+            <div class="span2">
+                <a href="#" class="thumbnail">
+                    <img src = "/static/logo.png" alt = "logo thumbnail">
+                </a>
+                <div class="caption">
+                    <h6>{{book.name}}</h6>
+                </div>
+				<div id="{{book.id}}" class="rateit"  data-rateit-value="0.0"></div>
+				<button onclick="rate_book({{book.id}}, $('#{{book.id}}').rateit('value'))">Submit Rating</button>
+            </div>
+        {% endfor %}
+    </div>
+	{% if books.has_prev %}<a href="{{ url_for('ratebooks', page=books.prev_num) }}">&lt;&lt; Previous books</a>{% else %}&lt;&lt; Previous books{% endif %} | 
+{% if books.has_next %}<a href="{{ url_for('ratebooks', page=books.next_num) }}">Next books &gt;&gt;</a>{% else %}Next books &gt;&gt;{% endif %}
+
+{% endblock %}

@@ -29,6 +29,6 @@ from models.model import User
 #login manager callback to load user
 @lm.user_loader
 def load_user(id):
-	return User.query.get(init(id))
+	return User.query.get(int(id))
 
 
