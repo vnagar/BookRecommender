@@ -18,6 +18,7 @@ def before_request():
 @app.route('/index')
 @login_required
 def index():
+	user = g.user
 	return  render_template('index.html', title='Home', user=user)
 
 @app.route('/register' , methods=['GET','POST'])
