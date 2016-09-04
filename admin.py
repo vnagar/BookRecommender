@@ -26,7 +26,7 @@ ap = argparse.ArgumentParser(add_help=False)
 subparsers = ap.add_subparsers(dest='cmd')
 parser_start = subparsers.add_parser("start", help="start the server")
 parser_create = subparsers.add_parser("create_db", help="create the db")
-parser_create = subparsers.add_parser("import_movies", help="import the movies")
+parser_create = subparsers.add_parser("import_books", help="import the books")
 parser_migrate = subparsers.add_parser("migrate_db", help="migrate db")
 parser_upgrade = subparsers.add_parser("upgrade_db", help="upgrade db")
 parser_downgrade = subparsers.add_parser("downgrade_db", help="downgrade db")
@@ -43,6 +43,7 @@ elif args.cmd == 'create_db':
 	dbutil.db_create()
 elif args.cmd == 'import_books':
 	print "In import books"
+	dbutil.import_books()
 elif args.cmd == 'migrate_db':
 	print "Migrating db..."
 	dbutil.db_migrate()

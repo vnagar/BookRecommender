@@ -7,6 +7,7 @@ from migrate.versioning import api
 from config import SQLALCHEMY_DATABASE_URI
 from config import SQLALCHEMY_MIGRATE_REPO
 from app import db
+from models.model import Book
 
 class DBUtils:
 	def __init__(self):
@@ -50,4 +51,24 @@ class DBUtils:
 		api.downgrade(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO, v - 1)
 		v = api.db_version(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)
 		print('Current database version: ' + str(v))
+
+	@staticmethod
+	def import_books():
+		books_filename = os.path.join("datastore/datasets", "Books.csv")
+		df = pd.read_csv(books_filename,header=0, sep=';')
+		for index, row in df.iterrows():
+			name = row['Book-Title'].decode("ISO-8859-1")
+			author = row['Book-Author'].decode("ISO-8859-1")
+			isbn = row['ISBN'].decode("ISO-8859-1")
+			url = row['Image-URL-S'].decode("ISO-8859-1")
+			print name, author, isbn, url 
+			book = Book(name, author, isbn, url)
+			db.session.add(book)
+
+		db.session.commit()
+
+		print "QUERYING THE DB for books..."
+		books = Book.query.all()
+		for book in books:
+			print "Book name is %s" %book.name
 
