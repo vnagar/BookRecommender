@@ -1,10 +1,29 @@
 import os
 import numpy as np
 from flask import abort, url_for, request, g, jsonify
-from app import app, engine, db
+from app import app, engine, db, auth
 from ml.engine import MLEngine
 from config import datasetdir
 from models.model import User, Book
+
+@auth.verify_password
+def verify_password(username_or_token, password):
+	# first try to authenticate by token
+	user = User.verify_auth_token(username_or_token)
+	if not user:
+		#try to authenticate with username/password
+		user = User.query.filter_by(username=username_or_token).first()
+		if not user or not user.verify_password(password):
+			return False
+	g.user = user
+	return True
+
+@app.route('/api/token')
+@auth.login_required
+def get_auth_token():
+	token = g.user.generate_auth_token()
+	return jsonify({'token': token.decode('ascii') })
+
 
 @app.route('/api/users', methods=['POST'])
 def new_user():
@@ -30,6 +49,7 @@ def get_user(id):
 
 @app.route('/api')
 @app.route('/api/index')
+@auth.login_required
 def api_index():
 	return jsonify("Hello, World!")
 

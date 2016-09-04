@@ -1,5 +1,7 @@
-from app import db
+from app import app, db
 from hashlib import md5
+from passlib.apps import custom_app_context as pwd_context
+from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 
 followers = db.Table('followers',
     db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
@@ -28,7 +30,7 @@ class Rating(db.Model):
 class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	username = db.Column(db.String(20), index=True, unique=True)
-	password = db.Column(db.String(20))
+	password_hash = db.Column(db.String(100))
 	email = db.Column(db.String(120), index=True, unique=True)
 	posts = db.relationship('Post', backref='author', lazy='dynamic')
 	about_me = db.Column(db.String(140))
@@ -42,15 +44,32 @@ class User(db.Model):
 								secondary="rating",
 								lazy='dynamic')
 
-	def __init__(self , username ,password , email):
+	def __init__(self, username, password, email):
 		self.username = username
-		self.password = password
+		self.password_hash = pwd_context.encrypt(password)
 		self.email = email
 
+	def generate_auth_token(self, expiration=600):
+		s = Serializer(app.config['SECRET_KEY'], expires_in = expiration)
+		return s.dumps({ 'id': self.id })
+
+	@staticmethod
+	def verify_auth_token(token):
+		s = Serializer(app.config['SECRET_KEY'])
+		try:
+			data = s.loads(token)
+		except SignatureExpired:
+			return None #valid token, but expired
+		except BadSignature:
+			return None #invalid token
+		user = User.query.get(data['id'])
+		return user
+
+	def hash_password(self, password):
+		self.password_hash = pwd_context.encrypt(password)
+
 	def verify_password(self, password):
-		if password == self.password:
-			return True
-		return False
+		return pwd_context.verify(password, self.password_hash)
 			
 	def is_authenticated(self):
 		return True

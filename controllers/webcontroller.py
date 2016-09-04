@@ -47,8 +47,8 @@ def login():
 		flash('Login requested for ="%s", remember_me=%s' %
 			(form.username.data, str(form.remember_me.data)))
 		session['remember_me'] = form.remember_me.data
-		registered_user = User.query.filter_by(username=form.username.data, password=form.password.data).first()
-		if registered_user is None:
+		registered_user = User.query.filter_by(username=form.username.data).first()
+		if not registered_user or not registered_user.verify_password(form.password.data):
 			flash('Username or password is invalid', 'error')
 			return redirect(url_for('login'))
 		remember_me = False
