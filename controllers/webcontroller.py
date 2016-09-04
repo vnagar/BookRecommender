@@ -19,7 +19,8 @@ def before_request():
 @login_required
 def index():
 	user = g.user
-	return  render_template('index.html', title='Home', user=user)
+	books = Book.query.limit(6).all()
+	return  render_template('index.html', title='Home', user=user, books=books)
 
 @app.route('/register' , methods=['GET','POST'])
 def register():

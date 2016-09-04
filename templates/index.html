@@ -18,11 +18,11 @@
 		{% for book in books %}
 			<div class="span2">
 				<a href="#" class="thumbnail">
-					<img src = "/static/logo.png" alt = "logo thumbnail">
+					<img src = {{ book.url }}  alt = "logo thumbnail">
 				</a>
 				<div class="caption">
 					<h6>{{book.name}}</h6>
-					<p>Some sample text.</p>
+					<p>{{book.author}}</p>
 				</div>
 			</div>
 		{% endfor %}

@@ -16,8 +16,8 @@ function show_followers(username, password, sourceId, destId, loadingId) {
     });
 }
 
-function rate_movie(movieid, rating) {
-	alert("The movie rating has value:  " + rating);
+function rate_book(movieid, rating) {
+	alert("The book rating has value:  " + rating);
 }
 
 $('.rateit').bind('rated reset', function (e) {
