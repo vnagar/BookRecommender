@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from flask import abort, url_for, request, g, jsonify
+from flask import abort, url_for, request, g, jsonify, json
 from app import app, engine, db, auth
 from ml.engine import MLEngine
 from config import datasetdir
@@ -80,3 +80,33 @@ def api_predict():
 	newList = np.asfarray(linebits)
 	prediction = engine.predictImage(newList)
 	return jsonify(prediction)
+
+
+@app.route('/api/showfollowers', methods=['POST'])
+def api_showfollowers():
+	print "Data:{}".format(request.data)
+	username = request.json.get("user")
+	user = User.query.filter_by(username=username).first()
+	if not user:
+		abort(400, 'Invalid user') # missing arguments
+
+	followers =  user.followers.all()
+	follower_list = []
+	for p in followers:
+		follower_list.append(p.username)
+	return json.dumps(follower_list)
+
+@app.route('/api/showratings', methods=['POST'])
+def api_showratings():
+	print "Data:{}".format(request.data)
+	username = request.json.get("user")
+	user = User.query.filter_by(username=username).first()
+	if not user:
+		abort(400, 'Invalid user') # missing arguments
+
+	ratings =  user.book_ratings
+	ratings_list = []
+	for p in ratings:
+		ratings_list.append(p.book.name)
+	return json.dumps(ratings_list)
+
