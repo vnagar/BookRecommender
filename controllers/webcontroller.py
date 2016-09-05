@@ -137,7 +137,7 @@ def unfollow(username):
 @app.route('/ratebooks/<int:page>')
 @login_required
 def ratebooks(page=1):
-	books = Book.query.paginate(page, 20, False)
+	books = Book.query.paginate(page, 24, False)
 	if books.has_next:
 		print "There are next books"
 	if books.has_prev:

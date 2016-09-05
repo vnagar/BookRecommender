@@ -111,7 +111,6 @@ class User(db.Model):
 			if r.book.id == int(bookid):
 				rating = r.rating
 		
-		print "Rating is{}".format(rating)
 		return "{}".format(rating)
 		
 
