@@ -106,6 +106,14 @@ class User(db.Model):
 
 	def add_book_rating(self, user, book, rating):
 		print user, book, rating
+		ratings_for_user = self.book_ratings
+		for r in ratings_for_user:
+			if r.book == book:
+				print "Found existing rating"
+				r.rating = rating
+				db.session.commit()
+				return self
+
 		ratingObject = Rating(user=user, book=book, rating=rating)
 		db.session.add(ratingObject)
 		self.book_ratings.append(ratingObject)
