@@ -15,7 +15,9 @@
                 <div class="caption">
                     <h6>{{book.name}}</h6>
                 </div>
-				<div id="{{book.id}}" class="rateit"  data-rateit-value="0.0"></div>
+				
+				<div id="{{book.id}}" class="rateit"  data-rateit-value={{ user.ratedValue(book.id) }}></div>
+
 				<button onclick="rate_book({{user.id}}, {{book.id}}, $('#{{book.id}}').rateit('value'))">Submit Rating</button>
             </div>
         {% endfor %}

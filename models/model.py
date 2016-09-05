@@ -104,6 +104,17 @@ class User(db.Model):
 	def followed_posts(self):
 		return Post.query.join(followers, (followers.c.followed_id == Post.user_id)).filter(followers.c.follower_id == self.id).order_by(Post.timestamp.desc())
 
+	def ratedValue(self, bookid):
+		rating = 0.0
+		ratings = self.book_ratings
+		for r in ratings:
+			if r.book.id == int(bookid):
+				rating = r.rating
+		
+		print "Rating is{}".format(rating)
+		return "{}".format(rating)
+		
+
 	def add_book_rating(self, user, book, rating):
 		print user, book, rating
 		ratings_for_user = self.book_ratings
