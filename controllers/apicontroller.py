@@ -32,8 +32,17 @@ def rate_book():
 	print bookid
 	rating = request.json.get('rating')
 	print rating
-	user = request.json.get('userid')
-	print user
+	userid = request.json.get('userid')
+	print userid
+	if not bookid or not rating or not userid:
+		abort(400, 'Missing information') # missing arguments
+	user = User.query.get(userid)
+	if not user:
+		abort(400, 'User information is invalid')
+	book = Book.query.get(bookid)
+	if not book:
+		abort(400, 'Book information is invalid')
+	user.add_book_rating(user, book, float(rating))
 	return jsonify({'result':'success'})
 
 @app.route('/api/users', methods=['POST'])

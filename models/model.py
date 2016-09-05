@@ -1,4 +1,5 @@
 from app import app, db
+from sqlalchemy.orm import backref
 from hashlib import md5
 from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
@@ -9,15 +10,17 @@ followers = db.Table('followers',
 )
 
 class Rating(db.Model):
+	__tablename__ = 'ratingtable'
 	id = db.Column(db.Integer, primary_key=True)
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 	book_id = db.Column(db.Integer, db.ForeignKey('book.id'))
 	rating = db.Column(db.Float)
 
-	user = db.relationship('User', backref='ratings')
-	book = db.relationship('Book', backref='ratings')
+	user = db.relationship('User', backref=backref("book_ratings"))
+	book = db.relationship('Book', backref=backref("user_ratings"))
 
 	def __init__(self, user=None, book=None, rating=None):
+		print "in __init__: ", user, book, rating
 		self.user = user
 		self.book = book
 		self.rating = rating
@@ -40,9 +43,7 @@ class User(db.Model):
 								secondaryjoin=(followers.c.followed_id == id), 
 								backref=db.backref('followers', lazy='dynamic'), 
 								lazy='dynamic')
-	books = db.relationship('Book',
-								secondary="rating",
-								lazy='dynamic')
+	books = db.relationship('Book', secondary='ratingtable', lazy='dynamic')
 
 	def __init__(self, username, password, email):
 		self.username = username
@@ -103,8 +104,12 @@ class User(db.Model):
 	def followed_posts(self):
 		return Post.query.join(followers, (followers.c.followed_id == Post.user_id)).filter(followers.c.follower_id == self.id).order_by(Post.timestamp.desc())
 
-	def add_book_rating(self, book, rating):
-		self.ratings.append(Rating(user=self, book=book, rating=rating))
+	def add_book_rating(self, user, book, rating):
+		print user, book, rating
+		ratingObject = Rating(user=user, book=book, rating=rating)
+		db.session.add(ratingObject)
+		self.book_ratings.append(ratingObject)
+		db.session.commit()
 		return self
 
 	def __repr__(self):
@@ -126,9 +131,7 @@ class Book(db.Model):
 	author = db.Column(db.String(100))
 	isbn = db.Column(db.String(20))
 	url = db.Column(db.String(140))
-	users = db.relationship('User',
-								secondary='rating',
-								lazy='dynamic')
+	users = db.relationship('User', secondary='ratingtable', lazy='dynamic')
 
 	def __init__(self, name, author, isbn, url):
 		self.name = name
