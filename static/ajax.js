@@ -16,8 +16,21 @@ function show_followers(username, password, sourceId, destId, loadingId) {
     });
 }
 
-function rate_book(movieid, rating) {
-	alert("The book rating has value:  " + rating);
+function rate_book(bookid, rating) {
+	rateurl = '/api/ratebook'
+	$.ajax({
+    	url: rateurl,
+    	dataType: 'json',
+    	type: 'post',
+    	contentType: 'application/json',
+    	data: JSON.stringify({ "bookid":bookid, "rating":rating}),
+    	success: function( data, textStatus, jQxhr ){
+			alert("Rating success")
+    	},
+    	error: function( jqXhr, textStatus, errorThrown ){
+			alert("Rating error")
+    	}
+	});
 }
 
 $('.rateit').bind('rated reset', function (e) {

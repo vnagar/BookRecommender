@@ -25,6 +25,15 @@ def get_auth_token():
 	return jsonify({'token': token.decode('ascii') })
 
 
+@app.route('/api/ratebook', methods=['POST'])
+def rate_book():
+	print "In rate book"
+	bookid = request.json.get('bookid')
+	print bookid
+	rating = request.json.get('rating')
+	print rating
+	return jsonify({'result':'success'})
+
 @app.route('/api/users', methods=['POST'])
 def new_user():
 	username = request.json.get('username')
