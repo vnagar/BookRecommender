@@ -4,7 +4,7 @@
 
 {% block content %}
 
-	<h3>Rate Movies</h3>
+	<h3>Rate Books</h3>
     <div class="row">
 		<!-- books is a Paginate object -->
         {% for book in books.items %}
@@ -16,7 +16,7 @@
                     <h6>{{book.name}}</h6>
                 </div>
 				<div id="{{book.id}}" class="rateit"  data-rateit-value="0.0"></div>
-				<button onclick="rate_book({{book.id}}, $('#{{book.id}}').rateit('value'))">Submit Rating</button>
+				<button onclick="rate_book({{user.id}}, {{book.id}}, $('#{{book.id}}').rateit('value'))">Submit Rating</button>
             </div>
         {% endfor %}
     </div>

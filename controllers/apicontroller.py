@@ -32,6 +32,8 @@ def rate_book():
 	print bookid
 	rating = request.json.get('rating')
 	print rating
+	user = request.json.get('userid')
+	print user
 	return jsonify({'result':'success'})
 
 @app.route('/api/users', methods=['POST'])

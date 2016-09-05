@@ -137,26 +137,13 @@ def unfollow(username):
 @app.route('/ratebooks/<int:page>')
 @login_required
 def ratebooks(page=1):
-	books = [
-	{
-		'id':'1',
-		'name':'Casablanca',
-		'url':'http://localhost/casablanca'
-	},
-	{
-		'id':'2',
-		'name':'Gone with the wind',
-		'url':'http://localhost/gonewiththewind'
-	}
-	]
-
 	books = Book.query.paginate(page, 20, False)
 	if books.has_next:
 		print "There are next books"
 	if books.has_prev:
 		print "There are prev books"
 
-	return render_template('ratebooks.html', user=user, books=books)
+	return render_template('ratebooks.html', user=g.user, books=books)
 
 @app.errorhandler(404)
 def not_found_error(error):
