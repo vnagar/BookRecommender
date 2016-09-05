@@ -47,7 +47,7 @@
             <div class="span3">
               <h2><strong>{{ user.book_ratings|length }}</strong></h2>
               <p><small>Movies Rated</small></p>
-              <button type="button" class="btn btn-primary btn-block"><span class="fa fa-gear"></span> Show Ratings </button>  
+              <a href="javascript:show_ratings('{{ user.username }}', '{{ user.password }}', '#followersID', '#showfollowersID', '#loadingID');" class="btn btn-info btn-block"><span class="fa fa-user"></span> Show Ratings </a>
             </div>
             <!--/col-->
           </div>
@@ -62,7 +62,7 @@
   <!--/row--> 
 
     <div class="outside">
-    <p><strong><span id="followersID">Followers</span></strong></p>
+    <p><strong><span id="followersID"></span></strong></p>
     <div>
         <span id="showfollowersID"> </span>        <img id="loadingID" style="display: none" src="/static/img/loading.gif">
      </div>

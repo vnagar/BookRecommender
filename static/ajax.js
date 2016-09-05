@@ -1,9 +1,28 @@
 
 function show_followers(username, password, sourceId, destId, loadingId) {
+	$(sourceId).text("Followers");
 	$(destId).hide();
     $(loadingId).show();
 	auth = 'Basic ' + btoa(username+':' + password);
 	url = '/api/showfollowers/' + username
+    $.get(url, function(){
+    }).done(function(showfollowers) {
+        $(destId).text(showfollowers['followers'])
+        $(loadingId).hide();
+        $(destId).show();
+    }).fail(function() {
+        $(destId).text("{{ _('Error: Could not contact server.') }}");
+        $(loadingId).hide();
+        $(destId).show();
+    });
+}
+
+function show_ratings(username, password, sourceId, destId, loadingId) {
+	$(sourceId).text("Ratings");
+	$(destId).hide();
+    $(loadingId).show();
+	auth = 'Basic ' + btoa(username+':' + password);
+	url = '/api/showratings/' + username
     $.get(url, function(){
     }).done(function(showfollowers) {
         $(destId).text(showfollowers['followers'])
