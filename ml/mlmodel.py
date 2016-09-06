@@ -1,44 +1,120 @@
 
-from keras.models import Sequential
-from keras.layers.convolutional import Convolution2D
-from keras.layers.convolutional import MaxPooling2D
-from keras.layers.core import Activation
-from keras.layers.core import Flatten
-from keras.layers.core import Dense
+from math import sqrt
 
 class MLModel:
 	@staticmethod
-	def build(width, height, depth, classes, weightsPath=None):
-		#initialize the model
-		model = Sequential()
-		
-		#first set of CONV => RELU => POOL
-		# 20 convolution filter of size 5x5
-		model.add(Convolution2D(20, 5, 5, border_mode="same", input_shape=(depth, height, width)))
-		model.add(Activation("relu"))
-		model.add(MaxPooling2D(pool_size=(2,2), strides=(2,2)))
-
-		# second set of CONV => RELU => POOL
-		# 50 convolution filter of size 5x5
-		model.add(Convolution2D(50, 5, 5, border_mode="same"))
-		model.add(Activation("relu"))
-		model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
-
-		#fully connected or Dense layers
-		# set of FC => RELU layers
-		# take output of prev MaxPooling layer and flatten into single vector
-		model.add(Flatten())
-		model.add(Dense(500))
-		model.add(Activation("relu"))
-
-		# softmax classifier
-		model.add(Dense(classes))
-		model.add(Activation("softmax"))
-
-		if weightsPath is not None:
-			#load model from weights
-			model.load_weights(weightsPath)
-	
+	def build(weightsPath=None):
+		model = MLModel()
 		return model
 
+
+	#Returns a distance-base similarity score for person1 and person2
+
+	def sim_distance(self, prefs, person1, person2):
+		#Get the list of shared_items
+		si = {}
+		for item in prefs[person1]:
+			if item in prefs[person2]:
+				si[item] = 1
+
+		#if they have no rating in common, return 0
+		if len(si) == 0: 
+			return 0
+
+		#Add up the squares of all differences
+		sum_of_squares = sum([pow(prefs[person1][item]-prefs[person2][item],2) for item in prefs[person1] if item in prefs[person2]])
+
+		return 1 / (1 + sum_of_squares)
+
+
+	#Returns the Pearson correlation coefficient for p1 and p2 
+	def sim_pearson(self, prefs,p1,p2):
+		#Get the list of mutually rated items
+		si = {}
+		for item in prefs[p1]:
+			if item in prefs[p2]: 
+				si[item] = 1
+
+		#if they are no rating in common, return 0
+		if len(si) == 0:
+			return 0
+
+		#sum calculations
+		n = len(si)
+
+		#sum of all preferences
+		sum1 = sum([prefs[p1][it] for it in si])
+		sum2 = sum([prefs[p2][it] for it in si])
+
+		#Sum of the squares
+		sum1Sq = sum([pow(prefs[p1][it],2) for it in si])
+		sum2Sq = sum([pow(prefs[p2][it],2) for it in si])
+
+		#Sum of the products
+		pSum = sum([prefs[p1][it] * prefs[p2][it] for it in si])
+
+		#Calculate r (Pearson score)
+		num = pSum - (sum1 * sum2/n)
+		den = sqrt((sum1Sq - pow(sum1,2)/n) * (sum2Sq - pow(sum2,2)/n))
+		if den == 0:
+			return 0
+
+		r = num/den
+
+		return r
+
+	#Returns the best matches for person from the prefs dictionary
+	#Number of the results and similiraty function are optional params.
+	def topMatches(self, prefs,person,n=5,similarity=sim_pearson):
+		scores = [(similarity(prefs,person,other),other)
+				for other in prefs if other != person]
+		scores.sort()
+		scores.reverse()
+		return scores[0:n]
+
+
+	#Gets recommendations for a person by using a weighted average
+	#of every other user's rankings
+
+	def getRecommendations(self, prefs,person,similarity=sim_pearson):
+		totals = {}
+		simSums = {}
+
+		for other in prefs:
+			#don't compare me to myself
+			if other == person:
+				continue
+			sim = similarity(self, prefs,person,other)
+
+			#ignore scores of zero or lower
+			if sim <= 0: 
+				continue
+			for item in prefs[other]:
+				#only score books i haven't seen yet
+				if item not in prefs[person] or prefs[person][item] == 0:
+					#Similarity * score
+					totals.setdefault(item,0)
+					totals[item] += prefs[other][item] * sim
+					#Sum of similarities
+					simSums.setdefault(item,0)
+					simSums[item] += sim
+
+			#Create the normalized list
+			rankings = [(total/simSums[item],item) for item,total in totals.items()]
+
+			#Return the sorted list
+			rankings.sort()
+			rankings.reverse()
+			return rankings
+
+	#Function to transform Person, item - > Item, person
+	def transformPrefs(self, prefs):
+		results = {}
+		for person in prefs:
+			for item in prefs[person]:
+				results.setdefault(item,{})
+
+				#Flip item and person
+				results[item][person] = prefs[person][item]
+		return results
 
