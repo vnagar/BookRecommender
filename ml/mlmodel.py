@@ -84,7 +84,7 @@ class MLModel:
 			#don't compare me to myself
 			if other == person:
 				continue
-			sim = similarity(self, prefs,person,other)
+			sim = similarity(prefs,person,other)
 
 			#ignore scores of zero or lower
 			if sim <= 0: 
@@ -106,6 +106,8 @@ class MLModel:
 			rankings.sort()
 			rankings.reverse()
 			return rankings
+
+		return []
 
 	#Function to transform Person, item - > Item, person
 	def transformPrefs(self, prefs):

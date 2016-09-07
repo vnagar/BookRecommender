@@ -6,9 +6,6 @@ def create_datastore_dirs(path):
 		if not os.path.isdir(path):
 			print "Creating directory %s" %path
 			os.makedirs(path)
-		else:
-			print "Directory %s already exists" %path
-
 	except OSError:
 		if not os.path.isdir(path):
 			raise

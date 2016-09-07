@@ -27,13 +27,9 @@ def get_auth_token():
 
 @app.route('/api/ratebook', methods=['POST'])
 def rate_book():
-	print "In rate book"
 	bookid = request.json.get('bookid')
-	print bookid
 	rating = request.json.get('rating')
-	print rating
 	userid = request.json.get('userid')
-	print userid
 	if not bookid or not rating or not userid:
 		abort(400, 'Missing information') # missing arguments
 	user = User.query.get(userid)
@@ -43,6 +39,7 @@ def rate_book():
 	if not book:
 		abort(400, 'Book information is invalid')
 	user.add_book_rating(user, book, float(rating))
+	engine.add_book_rating(user.id, book.isbn, float(rating))
 	return jsonify({'result':'success'})
 
 @app.route('/api/users', methods=['POST'])

@@ -1,8 +1,9 @@
+import os
 from datetime import datetime
 from app import app
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask_login import login_user, logout_user, current_user, login_required
-from app import app, db, lm
+from app import app, db, lm, engine, model
 from views.forms import LoginForm, RegisterForm, EditForm
 from models.model import User, Book
 
@@ -19,6 +20,7 @@ def before_request():
 @login_required
 def index():
 	user = g.user
+	recommended_books = get_recommended_books(user)
 	books = Book.query.limit(6).all()
 	return  render_template('index.html', title='Home', user=user, books=books)
 
@@ -34,6 +36,9 @@ def register():
 		#make the user follow him/herself
 		db.session.add(user.follow(user))
 		db.session.commit()
+
+		#reload user data for model
+		engine.loadDataset(os.path.join('./datastore', 'datasets'))
 
 		flash('User successfully registered')
 		return redirect('/login')
@@ -154,3 +159,15 @@ def internal_error(error):
 	db.session.rollback()
 	return render_template('500.html'), 500
 
+def get_recommended_books(user):
+	data = engine.getData()
+	userid = str(user.id + 500000)
+	recommendations = model.getRecommendations(data, userid, model.sim_distance)[0:6]
+	print recommendations
+	books = []
+	for (score, item) in recommendations:
+		book = Book.query.filter_by(isbn=item).first()
+		print score, book.name
+		books.append(book.name)
+
+	return books

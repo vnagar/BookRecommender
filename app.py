@@ -14,6 +14,7 @@ auth = HTTPBasicAuth()
 
 from ml.engine import MLEngine
 engine = MLEngine(os.path.join('./datastore', 'datasets'))
+model = engine.train_model(saveWeights=True)
 
 if not app.debug:
 	import logging
